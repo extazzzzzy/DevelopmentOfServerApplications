@@ -8,7 +8,7 @@ class InformationController extends Controller
 {
     public function serverInfo()
     {
-        $phpInfo = phpinfo();
+        $phpInfo = phpversion();
         return response()->json(['php_info' => $phpInfo]);
     }
 

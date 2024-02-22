@@ -14,6 +14,10 @@ use App\Http\Controllers\InformationController;
 |
 */
 
-Route::get('/info/server', [InformationController::class, 'serverInfo']);
-Route::get('/info/client', [InformationController::class, 'clientInfo']);
-Route::get('/info/database', [InformationController::class, 'databaseInfo']);
+Route::group(['prefix' => '/info'], function () {
+
+Route::get('/server', [InformationController::class, 'serverInfo']);
+Route::get('/client', [InformationController::class, 'clientInfo']);
+Route::get('/database', [InformationController::class, 'databaseInfo']);
+
+});
