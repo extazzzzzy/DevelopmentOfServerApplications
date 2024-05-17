@@ -15,8 +15,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => 'required|string|regex:/^(?=[A-Z])(?=.*[a-zA-Z])(?!.*\d)(?!.*\p{Cyrillic}).{7,}$/',
-            'password' => 'required|string|regex:/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?!.*\p{Cyrillic}).{8,}$/',
+            'username' => 'required|string|regex:/[A-Z][a-zA-Z]{6,}$/|unique:users',
+            'password' => 'required|string|min:8|regex:/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()-_=+]).{8,}$/',
         ];
     }
 

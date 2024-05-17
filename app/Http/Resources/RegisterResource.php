@@ -18,15 +18,4 @@ class RegisterResource
         $this->c_password = $data['c_password'];
         $this->birthday = $data['birthday'];
     }
-
-    public function toArray()
-    {
-        return [
-            'username' => $this->username,
-            'email' => $this->email,
-            'password' => $this->password,
-            'c_password' => $this->c_password,
-            'birthday' => $this->birthday,
-        ];
-    }
 }
