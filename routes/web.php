@@ -1,16 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\UserController;
 
 Route::group(['prefix' => '/api/auth'], function () {
 
-    Route::post('/login', [RENAME::class, '']);
-    Route::post('/register', [RENAME::class, '']);
-    Route::get('/me', [RENAME::class, '']);
-    Route::post('/out', [RENAME::class, '']);
-    Route::get('/tokens', [RENAME::class, '']);
-    Route::post('/out_all', [RENAME::class, '']);
+    Route::post('/login', [UserController::class, 'login']);
+    Route::post('/register', [UserController::class, 'register']);
+    Route::get('/me', [UserController::class, 'me']);
+    Route::post('/out', [UserController::class, 'out']);
+    Route::get('/tokens', [UserController::class, 'tokens']);
+    Route::post('/out_all', [UserController::class, 'out_all']);
 
 });
 

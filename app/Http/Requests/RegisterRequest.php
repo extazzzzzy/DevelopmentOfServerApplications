@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Resources\RegisterResource;
 
 class RegisterRequest extends FormRequest
 {
@@ -20,5 +21,10 @@ class RegisterRequest extends FormRequest
             'c_password' => 'required|string|same:password',
             'birthday' => 'required|date|date_format:Y-m-d',
         ];
+    }
+
+    public function getRegisterResource(): RegisterResource
+    {
+        return new RegisterResource($this->validated());
     }
 }
