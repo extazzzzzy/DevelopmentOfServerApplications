@@ -17,7 +17,7 @@ class UserResource
         $this->birthday = $data['birthday'];
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'id' => $this->id,
