@@ -14,6 +14,7 @@ class UserController extends Controller
 {
     public function login(LoginRequest $request)
     {
+        $this->clearExpiredTokens();
         $loginResource = $request->getLoginResource();
         if (Auth::attempt(['username' => $loginResource->username, 'password' => $loginResource->password]))
         {
@@ -33,6 +34,7 @@ class UserController extends Controller
 
     public function register(RegisterRequest $request)
     {
+        $this->clearExpiredTokens();
         $registerResource = $request->getRegisterResource();
         $user = new User([
             'username' => $registerResource->username,
@@ -46,24 +48,36 @@ class UserController extends Controller
 
     public function me()
     {
+        $this->clearExpiredTokens();
         $user = Auth::user();
         return response()->json(new UserResource($user));
     }
 
     public function out()
     {
+        $this->clearExpiredTokens();
         Auth::user()->currentAccessToken() -> delete();
         return response()->json(['message' => 'Вы успешно вышли из системы'], 200);
     }
 
     public function out_all()
     {
+        $this->clearExpiredTokens();
         Auth::user() -> tokens() -> delete();
         return response()->json(['message' => 'Всё токены пользователя уничтожены'], 200);
     }
 
     public function tokens()
     {
+        $this->clearExpiredTokens();
         return response()->json(['tokens' => Auth::user() -> tokens -> pluck('token')]);
+    }
+
+    public function clearExpiredTokens(): void
+    {
+        $expirationTime = now()->subMinutes(env('EXPIRATION_TOKEN'));
+        $deletedTokens = \DB::table('personal_access_tokens')
+            ->where('created_at', '<=', $expirationTime)
+            ->delete();
     }
 }
