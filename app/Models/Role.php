@@ -14,9 +14,20 @@ class Role extends Model
 
     protected $fillable = [
         'name',
-        'description'
+        'description',
+        'cipher'
     ];
     protected $dates = [
         'deleted_at'
     ];
+
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function ($role) {
+            $role->cipher = Str::uuid();
+        });
+    }
 }
