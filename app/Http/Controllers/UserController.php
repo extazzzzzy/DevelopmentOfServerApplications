@@ -76,7 +76,7 @@ class UserController extends Controller
     public function clearExpiredTokens(): void
     {
         $expirationTime = now()->subMinutes(env('EXPIRATION_TOKEN'));
-        $deletedTokens = \DB::table('personal_access_tokens')
+        \DB::table('personal_access_tokens')
             ->where('created_at', '<=', $expirationTime)
             ->delete();
     }
