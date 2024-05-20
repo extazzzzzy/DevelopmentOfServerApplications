@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\DTO;
 
-class RoleResource
+class RoleDTO
 {
     public $name;
     public $description;

@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\DTO\RegisterDTO;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Resources\RegisterResource;
 
 class RegisterRequest extends FormRequest
 {
@@ -23,9 +23,9 @@ class RegisterRequest extends FormRequest
         ];
     }
 
-    public function getRegisterResource(): RegisterResource
+    public function getRegisterResource(): RegisterDTO
     {
-        return new RegisterResource([
+        return new RegisterDTO([
             'username' => $this->input('username'),
             'email' => $this->input('email'),
             'password' => $this->input('password'),
