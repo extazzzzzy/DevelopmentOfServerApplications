@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\DTO\LoginDTO;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Resources\LoginResource;
 
 class LoginRequest extends FormRequest
 {
@@ -20,9 +20,9 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    public function getLoginResource(): LoginResource
+    public function getLoginResource(): LoginDTO
     {
-        return new LoginResource([
+        return new LoginDTO([
             'username' => $this->input('username'),
             'password' => $this->input('password'),
         ]);;

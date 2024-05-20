@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
+use App\DTO\UserDTO;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -50,7 +48,7 @@ class UserController extends Controller
     {
         $this->clearExpiredTokens();
         $user = Auth::user();
-        return response()->json(new UserResource($user));
+        return response()->json(new UserDTO($user));
     }
 
     public function out()

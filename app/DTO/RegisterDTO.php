@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\DTO;
 
-class RegisterResource
+class RegisterDTO
 {
     public $username;
     public $email;

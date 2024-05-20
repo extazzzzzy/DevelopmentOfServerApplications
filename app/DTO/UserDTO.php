@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\DTO;
 
-class UserResource
+class UserDTO
 {
     public $id;
     public $username;
