@@ -2,7 +2,7 @@
 
 namespace App\DTO;
 
-class RoleDTO
+class PermissionDTO
 {
     public $name;
     public $description;
