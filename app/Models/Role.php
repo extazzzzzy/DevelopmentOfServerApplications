@@ -15,19 +15,25 @@ class Role extends Model
     protected $fillable = [
         'name',
         'description',
-        'cipher'
+        'cipher',
+        'created_by',
+        'deleted_by'
     ];
     protected $dates = [
         'deleted_at'
     ];
 
-
-    protected static function boot(): void
+    protected static function boot()
     {
         parent::boot();
+        static::creating(function ($model) {
+            $model->cipher = Str::uuid();
+            $model->created_by = Auth::id();
+            $model->updated_by = Auth::id();
+        });
 
-        static::creating(function ($role) {
-            $role->cipher = Str::uuid();
+        static::updating(function ($model) {
+            $model->updated_by = Auth::id();
         });
     }
 }

@@ -8,10 +8,9 @@ class RoleDTO
     public $description;
     public $cipher;
 
-    public function __construct($name, $description, $cipher)
+    public function __construct($data)
     {
-        $this->name = $name;
-        $this->description = $description;
-        $this->cipher = $cipher;
+        $this->name = $data['name'];
+        $this->description = $data['description'];
     }
 }
