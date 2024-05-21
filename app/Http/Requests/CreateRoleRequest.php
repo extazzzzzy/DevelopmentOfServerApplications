@@ -35,4 +35,13 @@ class CreateRoleRequest extends FormRequest
             'description' => $this->input('description'),
         ]);
     }
+
+    public function messages()
+    {
+        return [
+            'name.required' => 'Название роли обязательно для заполнения.',
+            'name.string' => 'Название роли должно быть строкой.',
+            'name.unique' => 'Роль с таким названием уже существует.',
+        ];
+    }
 }

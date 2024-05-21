@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class Role extends Model
 {
@@ -19,9 +21,6 @@ class Role extends Model
         'created_by',
         'deleted_by'
     ];
-    protected $dates = [
-        'deleted_at'
-    ];
 
     protected static function boot()
     {
@@ -34,6 +33,16 @@ class Role extends Model
 
         static::updating(function ($model) {
             $model->updated_by = Auth::id();
+        });
+
+        static::deleting(function ($model) {
+            $model->deleted_by = Auth::id();
+            $model->save();
+        });
+
+        static::restoring(function ($model) {
+            $model->deleted_by = null;
+            $model->save();
         });
     }
 }

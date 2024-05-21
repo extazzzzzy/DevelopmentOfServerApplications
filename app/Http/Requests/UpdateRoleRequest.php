@@ -22,7 +22,7 @@ class UpdateRoleRequest extends FormRequest
      */
     public function rules(): array
     {
-        $roleId = $this->route('role')->id;
+        $roleId = $this->route('id');
         return [
             'name' => 'required|unique:roles,name,' . $roleId,
             'description' => 'string|max:255',
@@ -35,5 +35,14 @@ class UpdateRoleRequest extends FormRequest
             'name' => $this->input('name'),
             'description' => $this->input('description'),
         ]);
+    }
+
+    public function messages()
+    {
+        return [
+            'name.required' => 'Название роли обязательно для заполнения.',
+            'name.string' => 'Название роли должно быть строкой.',
+            'name.unique' => 'Роль с названием уже существует именем уже существует.',
+        ];
     }
 }
