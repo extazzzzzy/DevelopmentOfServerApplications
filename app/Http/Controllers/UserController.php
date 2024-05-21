@@ -16,7 +16,7 @@ class UserController extends Controller
         $loginResource = $request->getLoginResource();
         if (Auth::attempt(['username' => $loginResource->username, 'password' => $loginResource->password]))
         {
-            if (Auth::user() -> tokens() -> count() < env('MAX_ACTIVE_TOKENS'))
+            if (Auth::user() -> tokens() -> count() < env('MAX_ACTIVE_TOKENS', 3))
             {
                 $token = Auth::user()->createToken('token')->plainTextToken;
                 return response()->json(['token' => $token], 200);
@@ -65,10 +65,10 @@ class UserController extends Controller
         return response()->json(['message' => 'Всё токены пользователя уничтожены'], 200);
     }
 
-    public function tokens()
+    public function getTokens()
     {
         $this->clearExpiredTokens();
-        return response()->json(['tokens' => Auth::user() -> tokens -> pluck('token')]);
+        return response()->json(['tokens' => Auth::user() -> tokens() -> pluck('token')]);
     }
 
     public function clearExpiredTokens(): void

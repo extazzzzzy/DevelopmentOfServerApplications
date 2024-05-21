@@ -14,7 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/out', [UserController::class, 'out']);
         Route::get('/me', [UserController::class, 'me']);
-        Route::get('/tokens', [UserController::class, 'tokens']);
+        Route::get('/tokens', [UserController::class, 'getTokens']);
         Route::post('/out_all', [UserController::class, 'out_all']);
     });
 
