@@ -6,6 +6,7 @@ use App\DTO\PermissionCollectionDTO;
 use App\Http\Requests\CreatePermissionRequest;
 use App\Http\Requests\UpdatePermissionRequest;
 use App\Models\Permission;
+use App\Models\RoleAndPermission;
 use Illuminate\Http\Request;
 
 class PermissionController extends Controller
@@ -60,11 +61,18 @@ class PermissionController extends Controller
     public function deletePermissionHard($id)
     {
         $permission = Permission::find($id);
+        $roleAndPermissions = RoleAndPermission::where('permission_id', $id)->get();
+
         if (!$permission)
         {
             return response()->json(['error' => 'Такого разрешения не существует'], 404);
         }
         $permission->forceDelete();
+
+        foreach ($roleAndPermissions as $roleAndPermission)
+        {
+            $roleAndPermission->forceDelete();
+        }
 
         return response()->json([
             'message' => 'Разрешение успешно удалено(Hard)',
@@ -74,11 +82,17 @@ class PermissionController extends Controller
     public function deletePermissionSoft($id)
     {
         $permission = Permission::find($id);
+        $roleAndPermissions = RoleAndPermission::where('permission_id', $id)->get();
         if (!$permission)
         {
             return response()->json(['error' => 'Такого разрешения не существует'], 404);
         }
         $permission->delete();
+
+        foreach ($roleAndPermissions as $roleAndPermission)
+        {
+            $roleAndPermission->delete();
+        }
 
         return response()->json([
             'message' => 'Разрешение успешно удалено(Soft)',
@@ -88,10 +102,14 @@ class PermissionController extends Controller
     public function restoreSoftDeletedPermission($id)
     {
         $permission = Permission::withTrashed()->find($id);
-
+        $roleAndPermissions = RoleAndPermission::withTrashed()->where('permission_id', $id)->get();
         if ($permission && $permission->trashed())
         {
             $permission->restore();
+            foreach ($roleAndPermissions as $roleAndPermission)
+            {
+                $roleAndPermission->restore();
+            }
             return response()->json([
                 'message' => 'Разрешение успешно восстановлено',
             ], 200);

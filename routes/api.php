@@ -4,21 +4,22 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleAndPermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserAndRoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\AuthController;
 
 Route::group(['prefix' => '/auth'], function () {
-    Route::post('/login', [UserController::class, 'login']);
-    Route::middleware('guest:sanctum') -> post('/register', [UserController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::middleware('guest:sanctum') -> post('/register', [AuthController::class, 'register']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->group(function () {
-        Route::post('/out', [UserController::class, 'out']);
-        Route::get('/me', [UserController::class, 'me']);
-        Route::get('/tokens', [UserController::class, 'getTokens']);
-        Route::post('/out_all', [UserController::class, 'out_all']);
+        Route::post('/out', [AuthController::class, 'out']);
+        Route::get('/me', [AuthController::class, 'me']);
+        Route::get('/tokens', [AuthController::class, 'getTokens']);
+        Route::post('/out_all', [AuthController::class, 'out_all']);
     });
 
     Route::prefix('ref')->group(function () {
@@ -81,7 +82,18 @@ Route::middleware('auth:sanctum')->group(function () {
             });
         });
 
+        Route::prefix('user')->group(function () {
+            Route::get('', [UserController::class, 'getCollectionUsers']);
+            Route::post('', [UserController::class, 'createUser']);
 
+            Route::prefix('{user_id}')->group(function () {
+                Route::get('', [UserController::class, 'getUser']);
+                Route::put('', [UserController::class, 'updateUser']);
+                Route::delete('', [UserController::class, 'deleteUserHard']);
+                Route::delete('/soft', [UserController::class, 'deleteUserSoft']);
+                Route::post('/restore', [UserController::class, 'restoreSoftDeletedUser']);
+            });
+        });
 
     });
 });

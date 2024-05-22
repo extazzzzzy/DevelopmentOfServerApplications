@@ -2,80 +2,130 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\UserDTO;
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RegisterRequest;
+use App\DTO\UserCollectionDTO;
+use App\Http\Requests\CreateUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use App\Models\UserAndRole;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function login(LoginRequest $request)
+    public function getCollectionUsers()
     {
-        $this->clearExpiredTokens();
-        $loginResource = $request->getLoginResource();
-        if (Auth::attempt(['username' => $loginResource->username, 'password' => $loginResource->password]))
-        {
-            if (Auth::user() -> tokens() -> count() < env('MAX_ACTIVE_TOKENS', 3))
-            {
-                $token = Auth::user()->createToken('token')->plainTextToken;
-                return response()->json(['token' => $token], 200);
-            }
-            else
-            {
-                return response()->json(['message' => 'Авторизованно максимальное количество пользователей']);
-            }
-
-        }
-        return response()->json(['error' => 'Неверный логин или пароль']);
+        $users = User::all();
+        $userCollectionDTO = new UserCollectionDTO($users, $users->count());
+        return response()->json($userCollectionDTO);
     }
 
-    public function register(RegisterRequest $request)
+    public function createUser(CreateUserRequest $request)
     {
-        $this->clearExpiredTokens();
-        $registerResource = $request->getRegisterResource();
+        $userResource = $request->getUserResource();
         $user = new User([
-            'username' => $registerResource->username,
-            'email' => $registerResource->email,
-            'password' => $registerResource->password,
-            'birthday' => $registerResource->birthday,
+            'username' => $userResource -> username,
+            'email' => $userResource -> email,
+            'password' => $userResource -> password,
+            'birthday' => $userResource -> birthday,
         ]);
-        $user->save();
-        return response()->json(['Пользователь успешно зарегистрирован' => $user], 201);
+        $user -> save();
+        return response()->json(['Пользователь успешно создан' => $user], 201);
     }
 
-    public function me()
+    public function getUser($user_id)
     {
-        $this->clearExpiredTokens();
-        $user = Auth::user();
-        return response()->json(new UserDTO($user));
+        $user = User::find($user_id);
+
+        if (!$user)
+        {
+            return response()->json(['error' => 'Такого пользователя не существует'], 404);
+        }
+        return response()->json($user, 200);
     }
 
-    public function out()
+    public function updateUser($user_id, UpdateUserRequest $request)
     {
-        $this->clearExpiredTokens();
-        Auth::user()->currentAccessToken() -> delete();
-        return response()->json(['message' => 'Вы успешно вышли из системы'], 200);
+        $userResource = User::find($user_id);
+        if (!$userResource)
+        {
+            return response()->json(['error' => 'Такого пользователя не существует'], 404);
+        }
+        $userResource->username = $request->getUserResource()->username;
+        $userResource->email = $request->getUserResource()->email;
+        $userResource->password = $request->getUserResource()->password;
+        $userResource->birthday = $request->getUserResource()->birthday;
+
+        $userResource->save();
+
+        return response()->json([
+            'message' => 'Данные пользователя успешно измененены',
+            'userResource' => $userResource
+        ], 200);
     }
 
-    public function out_all()
+    public function deleteUserHard($user_id)
     {
-        $this->clearExpiredTokens();
-        Auth::user() -> tokens() -> delete();
-        return response()->json(['message' => 'Всё токены пользователя уничтожены'], 200);
+        $user = User::find($user_id);
+        $userAndRoles = UserAndRole::where('user_id', $user_id)->get();
+        if (!$user)
+        {
+            return response()->json(['error' => 'Такого пользователя не существует'], 404);
+        }
+
+        $user->forceDelete();
+
+        foreach ($userAndRoles as $userAndRole)
+        {
+            $userAndRole->forceDelete();
+        }
+
+        return response()->json([
+            'message' => 'Пользователь успешно удалён(Hard)',
+        ], 200);
     }
 
-    public function getTokens()
+    public function deleteUserSoft($user_id)
     {
-        $this->clearExpiredTokens();
-        return response()->json(['tokens' => Auth::user() -> tokens() -> pluck('token')]);
+        $user = User::find($user_id);
+        $userAndRoles = UserAndRole::where('user_id', $user_id)->get();
+        if (!$user)
+        {
+            return response()->json(['error' => 'Такого пользователя не существует'], 404);
+        }
+
+        $user->delete();
+
+        foreach ($userAndRoles as $userAndRole)
+        {
+            $userAndRole->delete();
+        }
+
+        return response()->json([
+            'message' => 'Пользователь успешно удалён(Soft)',
+        ], 200);
     }
 
-    public function clearExpiredTokens(): void
+    public function restoreSoftDeletedUser($user_id)
     {
-        $expirationTime = now()->subMinutes(env('EXPIRATION_TOKEN'));
-        \DB::table('personal_access_tokens')
-            ->where('created_at', '<=', $expirationTime)
-            ->delete();
+        $user = User::withTrashed()->find($user_id);
+        $userAndRoles = UserAndRole::withTrashed()->where('user_id', $user_id)->get();
+        if ($user && $user->trashed())
+        {
+            $user->restore();
+
+            foreach ($userAndRoles as $userAndRole)
+            {
+                $userAndRole->restore();
+            }
+
+            return response()->json([
+                'message' => 'Пользователь успешно восстановлен',
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'message' => 'Пользователь не найден или не был удален',
+            ], 404);
+        }
     }
 }

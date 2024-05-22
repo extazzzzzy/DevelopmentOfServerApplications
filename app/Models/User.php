@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -24,6 +26,8 @@ class User extends Authenticatable
         'email',
         'password',
         'birthday',
+        'created_by',
+        'deleted_by',
     ];
 
     /**
@@ -45,4 +49,26 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            $model->created_by = Auth::id();
+            $model->updated_by = Auth::id();
+        });
+
+        static::updating(function ($model) {
+            $model->updated_by = Auth::id();
+        });
+
+        static::deleting(function ($model) {
+            $model->deleted_by = Auth::id();
+            $model->save();
+        });
+
+        static::restoring(function ($model) {
+            $model->deleted_by = null;
+        });
+    }
 }
