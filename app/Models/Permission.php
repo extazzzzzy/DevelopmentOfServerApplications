@@ -36,12 +36,10 @@ class Permission extends Model
 
         static::deleting(function ($model) {
             $model->deleted_by = Auth::id();
-            $model->save();
         });
 
         static::restoring(function ($model) {
             $model->deleted_by = null;
-            $model->save();
         });
     }
 }

@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\RoleAndPermissionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserAndRoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -47,23 +49,39 @@ Route::middleware('auth:sanctum')->group(function () {
                     Route::post('/restore', [PermissionController::class, 'restoreSoftDeletedPermission']);
                 });
             });
-        });
 
-        Route::prefix('user')->group(function () {
-            Route::get('', [UserAndRoleController::class, 'getCollectionUsersAndRoles']);
+            Route::prefix('user_and_role')->group(function () {
+                Route::get('', [UserAndRoleController::class, 'getCollectionUsersAndRoles']);
 
-            Route::prefix('{id}/role')->group(function () {
-                Route::post('', [UserAndRoleController::class, 'createUserAndRole']);
-                Route::get('', [UserAndRoleController::class, 'getCollectionUserAndRoles']);
+                Route::prefix('user/{user_id}/role')->group(function () {
+                    Route::post('', [UserAndRoleController::class, 'createUserAndRole']);
+                    Route::get('', [UserAndRoleController::class, 'getCollectionUserAndRoles']);
 
-                Route::prefix('{id}')->group(function () {
-                    Route::put('', [UserAndRoleController::class, 'updateUserAndRole']);
-                    Route::delete('', [UserAndRoleController::class, 'deleteUserAndRoleHard']);
-                    Route::delete('/soft', [UserAndRoleController::class, 'deleteUserAndRoleSoft']);
-                    Route::post('/restore', [UserAndRoleController::class, 'restoreSoftDeletedUserAndRole']);
+                    Route::prefix('{role_id}')->group(function () {
+                        Route::delete('', [UserAndRoleController::class, 'deleteUserAndRoleHard']);
+                        Route::delete('/soft', [UserAndRoleController::class, 'deleteUserAndRoleSoft']);
+                        Route::post('/restore', [UserAndRoleController::class, 'restoreSoftDeletedUserAndRole']);
+                    });
+                });
+            });
+
+            Route::prefix('role_and_permission')->group(function () {
+                Route::get('', [RoleAndPermissionController::class, 'getCollectionRolesAndPermissions']);
+
+                Route::prefix('role/{role_id}/permission')->group(function () {
+                    Route::post('', [RoleAndPermissionController::class, 'createRoleAndPermission']);
+                    Route::get('', [RoleAndPermissionController::class, 'getCollectionRoleAndPermissions']);
+
+                    Route::prefix('{permission_id}')->group(function () {
+                        Route::delete('', [RoleAndPermissionController::class, 'deleteRoleAndPermissionHard']);
+                        Route::delete('/soft', [RoleAndPermissionController::class, 'deleteRoleAndPermissionSoft']);
+                        Route::post('/restore', [RoleAndPermissionController::class, 'restoreSoftDeletedRoleAndPermission']);
+                    });
                 });
             });
         });
+
+
 
     });
 });

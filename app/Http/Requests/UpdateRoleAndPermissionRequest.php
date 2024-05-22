@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\DTO\UserAndRoleDTO;
+use App\DTO\RoleAndPermissionDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateUserAndRoleRequest extends FormRequest
+class UpdateRoleAndPermissionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,25 +23,25 @@ class CreateUserAndRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'integer',
             'role_id' => 'integer',
+            'permission_id' => 'integer',
         ];
     }
 
-    public function getUserAndRoleResource(): UserAndRoleDTO
+    public function getRoleAndPermissionResource(): RoleAndPermissionDTO
     {
-        return new UserAndRoleDTO([
-            'user_id' => $this->input('user_id'),
+        return new RoleAndPermissionDTO([
             'role_id' => $this->input('role_id'),
+            'permission_id' => $this->input('permission_id'),
         ]);
     }
 
     public function messages()
     {
         return [
-            'user_id.integer' => 'Ссылка должна быть целым числом.',
-            'role_id.required' => 'Ссылка на роль обязательна для заполнения.',
             'role_id.integer' => 'Ссылка должна быть целым числом.',
+            'permission_id.required' => 'Ссылка на роль обязательна для заполнения.',
+            'permission_id.integer' => 'Ссылка должна быть целым числом.',
         ];
     }
 }
