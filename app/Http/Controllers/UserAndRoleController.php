@@ -15,8 +15,7 @@ class UserAndRoleController extends Controller
     public function getCollectionUsersAndRoles()
     {
         $usersAndRoles = UserAndRole::all();
-        $userRoleCollectionDTO = new UserAndRoleCollectionDTO($usersAndRoles, $usersAndRoles->count());
-        return response()->json($userRoleCollectionDTO);
+        return response()->json($usersAndRoles);
     }
 
     public function createUserAndRole($user_id, CreateUserAndRoleRequest $request)
@@ -49,13 +48,12 @@ class UserAndRoleController extends Controller
 
     public function getCollectionUserAndRoles($user_id)
     {
-        $userRoles = UserAndRole::where('user_id', $user_id)->get();
-        if(count($userRoles) == 0)
-        {
+        $user = User::with('roles')->find($user_id);
+        if (!$user) {
             return response()->json(['error' => 'Указанный пользователь не найден'], 404);
         }
 
-        $userRoleCollectionDTO = new UserAndRoleCollectionDTO($userRoles, $userRoles->count());
+        $userRoleCollectionDTO = new UserAndRoleCollectionDTO($user);
         return response()->json($userRoleCollectionDTO);
     }
 

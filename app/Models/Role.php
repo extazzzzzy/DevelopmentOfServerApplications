@@ -44,4 +44,9 @@ class Role extends Model
             $model->deleted_by = null;
         });
     }
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'role_and_permissions');
+    }
 }

@@ -14,8 +14,7 @@ class RoleAndPermissionController extends Controller
     public function getCollectionRolesAndPermissions()
     {
         $rolesAndPermissions = RoleAndPermission::all();
-        $rolePermissionCollectionDTO = new RoleAndPermissionCollectionDTO($rolesAndPermissions, $rolesAndPermissions->count());
-        return response()->json($rolePermissionCollectionDTO);
+        return response()->json($rolesAndPermissions);
     }
 
     public function createRoleAndPermission($role_id, CreateRoleAndPermissionRequest $request)
@@ -48,14 +47,13 @@ class RoleAndPermissionController extends Controller
 
     public function getCollectionRoleAndPermissions($role_id)
     {
-        $rolePermissions = RoleAndPermission::where('role_id', $role_id)->get();
-        if(count($rolePermissions) == 0)
-        {
+        $role = Role::with('permissions')->find($role_id);
+        if (!$role) {
             return response()->json(['error' => 'Указанная роль не найдена'], 404);
         }
 
-        $rolePermissionCollectionDTO = new RoleAndPermissionCollectionDTO($rolePermissions, $rolePermissions->count());
-        return response()->json($rolePermissionCollectionDTO);
+        $rolePermissionsCollectionDTO = new RoleAndPermissionCollectionDTO($role);
+        return response()->json($rolePermissionsCollectionDTO);
     }
 
     public function deleteRoleAndPermissionHard($role_id, $permission_id)

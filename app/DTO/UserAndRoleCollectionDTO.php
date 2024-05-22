@@ -4,12 +4,18 @@ namespace App\DTO;
 
 class UserAndRoleCollectionDTO
 {
-    public $users_and_roles;
-    public $total;
+    public $user_id;
+    public $roles;
 
-    public function __construct($users_and_roles, $total)
+    public function __construct($user)
     {
-        $this->users_and_roles = $users_and_roles;
-        $this->total = $total;
+        $this->user_id = $user->id;
+        $this->roles = $user->roles->map(function ($role) {
+            return [
+                'role_id' => $role->id,
+                'name' => $role->name,
+                'description' => $role->description,
+            ];
+        });
     }
 }

@@ -71,4 +71,9 @@ class User extends Authenticatable
             $model->deleted_by = null;
         });
     }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_and_roles');
+    }
 }
