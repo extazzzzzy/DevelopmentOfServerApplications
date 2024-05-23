@@ -22,7 +22,7 @@ class RolesAndPermissionsTableSeeder extends Seeder
 
         $adminRole->permissions()->sync($allPermissions->pluck('id')->toArray());
 
-        $userPermissions = Permission::whereIn('name', ['get-list-user', 'read-user', 'update-user'])->get();
+        $userPermissions = Permission::whereIn('name', ['get-list-user', 'get-user', 'update-user', 'get-user_and_role'])->get();
         $userRole->permissions()->sync($userPermissions->pluck('id')->toArray());
 
         $guestPermissions = Permission::where('name', 'get-list-user')->get();

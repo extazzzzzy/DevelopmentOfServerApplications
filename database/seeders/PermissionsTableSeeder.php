@@ -14,8 +14,8 @@ class PermissionsTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $entities = ['user', 'role', 'permission'];
-        $actions = ['get-list', 'read', 'create', 'update', 'delete', 'restore'];
+        $entities = ['user', 'role', 'permission', 'user_and_role', 'role_and_permission'];
+        $actions = ['get-list', 'get', 'create', 'update', 'delete', 'restore'];
         $permissions = [];
 
         foreach ($entities as $entity) {

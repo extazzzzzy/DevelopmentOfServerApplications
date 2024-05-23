@@ -14,8 +14,16 @@ class UserAndRoleController extends Controller
 {
     public function getCollectionUsersAndRoles()
     {
-        $usersAndRoles = UserAndRole::all();
-        return response()->json($usersAndRoles);
+        $usersAndRoles = UserAndRole::with('user', 'role')->get();
+
+        $result = $usersAndRoles->map(function ($userAndRole) {
+            return [
+                'username' => $userAndRole->user->username,
+                'rolename' => $userAndRole->role->name,
+            ];
+        });
+
+        return response()->json($result);
     }
 
     public function createUserAndRole($user_id, CreateUserAndRoleRequest $request)
@@ -53,8 +61,13 @@ class UserAndRoleController extends Controller
             return response()->json(['error' => 'Указанный пользователь не найден'], 404);
         }
 
-        $userRoleCollectionDTO = new UserAndRoleCollectionDTO($user);
-        return response()->json($userRoleCollectionDTO);
+        $userRoles = $user->roles->map(function($role) use ($user) {
+            return [
+                'rolename' => $role->name
+            ];
+        });
+
+        return response()->json(['Роли пользователя:' => $userRoles]);
     }
 
     public function deleteUserAndRoleHard($user_id, $role_id)
