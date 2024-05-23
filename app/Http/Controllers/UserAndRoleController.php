@@ -9,6 +9,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\UserAndRole;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserAndRoleController extends Controller
 {
@@ -56,8 +57,14 @@ class UserAndRoleController extends Controller
 
     public function getCollectionUserAndRoles($user_id)
     {
+        if (!(Auth::user()->roles->contains('name', 'Admin')) && $user_id != Auth::id())
+        {
+            return response()->json(['error' => 'У вас недостаточно прав для просмотра ролей другого пользователя!'], 404);
+        }
+
         $user = User::with('roles')->find($user_id);
-        if (!$user) {
+        if (!$user)
+        {
             return response()->json(['error' => 'Указанный пользователь не найден'], 404);
         }
 

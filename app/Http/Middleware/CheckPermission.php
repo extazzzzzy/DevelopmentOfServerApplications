@@ -32,6 +32,7 @@ class CheckPermission
             }
         }
 
-        return response()->json(['error' => 'Ошибка доступа'], 403);
+        $requiredPermissions = implode(', ', $permissions);
+        return response()->json(['error' => "Ошибка доступа. Требуется(-ются) разрешение(-ия): $requiredPermissions"], 403);
     }
 }

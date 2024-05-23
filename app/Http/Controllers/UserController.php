@@ -8,12 +8,13 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use App\Models\UserAndRole;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     public function getCollectionUsers()
     {
-        $users = User::all();
+        $users = User::all('username');
         $userCollectionDTO = new UserCollectionDTO($users, $users->count());
         return response()->json($userCollectionDTO);
     }
@@ -33,7 +34,12 @@ class UserController extends Controller
 
     public function getUser($user_id)
     {
-        $user = User::find($user_id);
+        if (!(Auth::user()->roles->contains('name', 'Admin')) && $user_id != Auth::id())
+        {
+            return response()->json(['error' => 'У вас недостаточно прав для просмотра ролей другого пользователя!'], 404);
+        }
+
+        $user = User::find($user_id)->only(['id', 'username', 'email', 'password', 'birthday']);
 
         if (!$user)
         {
@@ -44,6 +50,11 @@ class UserController extends Controller
 
     public function updateUser($user_id, UpdateUserRequest $request)
     {
+        if (!(Auth::user()->roles->contains('name', 'Admin')) && $user_id != Auth::id())
+        {
+            return response()->json(['error' => 'У вас недостаточно прав для просмотра ролей другого пользователя!'], 404);
+        }
+
         $userResource = User::find($user_id);
         if (!$userResource)
         {
