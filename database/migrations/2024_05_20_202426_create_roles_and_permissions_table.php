@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('permission_id');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrent();
             $table->timestamp('updated_at')->nullable();
-            $table->integer('created_by');
+            $table->integer('created_by')->default(0);
             $table->softDeletes()->nullable(); // deleted_at
             $table->integer('deleted_by')->nullable();
             $table->integer('updated_by')->nullable();
