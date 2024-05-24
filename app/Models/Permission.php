@@ -8,11 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
-class Role extends Model
+class Permission extends Model
 {
     use HasFactory;
     use SoftDeletes;
-
 
     protected $fillable = [
         'name',
@@ -45,8 +44,8 @@ class Role extends Model
         });
     }
 
-    public function permissions()
+    public function roles()
     {
-        return $this->belongsToMany(Permission::class, 'role_and_permissions');
+        return $this->belongsToMany(Role::class, 'role_and_permissions');
     }
 }

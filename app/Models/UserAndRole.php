@@ -8,25 +8,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
-class Role extends Model
+class UserAndRole extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
-
     protected $fillable = [
-        'name',
-        'description',
-        'cipher',
+        'user_id',
+        'role_id',
         'created_by',
-        'deleted_by'
+        'deleted_by',
     ];
 
     protected static function boot()
     {
         parent::boot();
         static::creating(function ($model) {
-            $model->cipher = Str::uuid();
             $model->created_by = Auth::id();
             $model->updated_by = Auth::id();
         });
@@ -45,8 +42,13 @@ class Role extends Model
         });
     }
 
-    public function permissions()
+    public function user()
     {
-        return $this->belongsToMany(Permission::class, 'role_and_permissions');
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
     }
 }

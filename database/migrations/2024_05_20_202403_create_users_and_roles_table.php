@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users_and_roles', function (Blueprint $table) {
+        Schema::create('user_and_roles', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
             $table->integer('role_id');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'))->useCurrent();
+            $table->timestamp('updated_at')->nullable();
             $table->integer('created_by');
             $table->softDeletes()->nullable(); // deleted_at
+            $table->integer('deleted_by')->nullable();
             $table->integer('updated_by')->nullable();
         });
     }
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users_and_roles');
+        Schema::dropIfExists('user_and_roles');
     }
 };
