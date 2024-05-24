@@ -31,4 +31,12 @@ class ChangeLogController extends Controller
         $logs = ChangeLog::where('entity', 'App\Models\Permission')->where('entity_id', $id)->get();
         return response()->json(new ChangeLogCollectionDTO($logs));
     }
+
+    public function restore($id)
+    {
+        $log = ChangeLog::findOrFail($id);
+        $entity = $log->entity::findOrFail($log->entity_id);
+        $entity->update($log->old_value);
+        return response()->json($entity);
+    }
 }

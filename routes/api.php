@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Lab3
     Route::prefix('ref')->group(function () {
         Route::get('/story', [ChangeLogController::class, 'getCollectionLogs'])->middleware('check.permission:get-story-collection'); // Lab4
+        Route::post('/story/{id}/restore', [ChangeLogController::class, 'restore'])->middleware('check.permission:update-story'); // Lab4
 
         Route::prefix('policy')->group(function () {
             Route::prefix('role')->group(function () {
