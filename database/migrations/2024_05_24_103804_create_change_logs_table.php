@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('entity');
             $table->unsignedBigInteger('entity_id');
-            $table->json('old_value');
-            $table->json('new_value');
+            $table->json('old_value')->nullable();
+            $table->json('new_value')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->timestamps();
 
