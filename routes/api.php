@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Lab3
     Route::prefix('ref')->group(function () {
-        Route::get('/story', [ChangeLogController::class, 'getCollectionLogs']); // Lab4
+        Route::get('/story', [ChangeLogController::class, 'getCollectionLogs'])->middleware('check.permission:get-story-collection'); // Lab4
 
         Route::prefix('policy')->group(function () {
             Route::prefix('role')->group(function () {
@@ -35,7 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::post('', [RoleController::class, 'createRole'])->middleware('check.permission:create-role');
 
                 Route::prefix('{id}')->group(function () {
-                    Route::get('/story', [ChangeLogController::class, 'getRoleLogs']); // Lab4
+                    Route::get('/story', [ChangeLogController::class, 'getRoleLogs'])->middleware('check.permission:get-story-role'); // Lab4
 
                     Route::get('', [RoleController::class, 'getRole'])->middleware('check.permission:get-role');
                     Route::put('', [RoleController::class, 'updateRole'])->middleware('check.permission:update-role');
@@ -51,7 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::post('', [PermissionController::class, 'createPermission'])->middleware('check.permission:create-permission');
 
                 Route::prefix('{id}')->group(function () {
-                    Route::get('/story', [ChangeLogController::class, 'getPermissionLogs']); // Lab4
+                    Route::get('/story', [ChangeLogController::class, 'getPermissionLogs'])->middleware('check.permission:get-story-permission'); // Lab4
 
                     Route::get('', [PermissionController::class, 'getPermission'])->middleware('check.permission:get-permission');
                     Route::put('', [PermissionController::class, 'updatePermission'])->middleware('check.permission:update-permission');
@@ -97,7 +97,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('', [UserController::class, 'createUser'])->middleware('check.permission:create-user');
 
             Route::prefix('{user_id}')->group(function () {
-                Route::get('/story', [ChangeLogController::class, 'getUserLogs']); // Lab4
+                Route::get('/story', [ChangeLogController::class, 'getUserLogs'])->middleware('check.permission:get-story-user'); // Lab4
 
                 Route::get('', [UserController::class, 'getUser'])->middleware('check.permission:get-user');
                 Route::put('', [UserController::class, 'updateUser'])->middleware('check.permission:update-user');
