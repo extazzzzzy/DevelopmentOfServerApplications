@@ -14,6 +14,7 @@ class PermissionsTableSeeder extends Seeder
      */
     public function run(): void
     {
+        // Lab 3
         $entities = ['user', 'role', 'permission', 'user_and_role', 'role_and_permission'];
         $actions = ['get-list', 'get', 'create', 'update', 'delete', 'restore'];
         $permissions = [];
@@ -29,6 +30,15 @@ class PermissionsTableSeeder extends Seeder
                 ];
             }
         }
+
+        // Lab 4
+        DB::table('permissions')->insert([
+            ['name' => 'get-story-role', 'cipher' => Str::uuid(), 'created_at' => now(), 'updated_at' => now(), 'created_by' => 0],
+            ['name' => 'get-story-permission', 'cipher' => Str::uuid(), 'created_at' => now(), 'updated_at' => now(), 'created_by' => 0],
+            ['name' => 'get-story-user', 'cipher' => Str::uuid(), 'created_at' => now(), 'updated_at' => now(), 'created_by' => 0],
+            ['name' => 'get-story-collection', 'cipher' => Str::uuid(), 'created_at' => now(), 'updated_at' => now(), 'created_by' => 0],
+            ['name' => 'update-story', 'cipher' => Str::uuid(), 'created_at' => now(), 'updated_at' => now(), 'created_by' => 0],
+        ]);
 
         DB::table('permissions')->insert($permissions);
     }
