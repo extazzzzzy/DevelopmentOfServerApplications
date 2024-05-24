@@ -10,9 +10,11 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use App\Traits\LogsChanges;
 
 class User extends Authenticatable
 {
+    use LogsChanges;
     use HasApiTokens, HasFactory, Notifiable;
     use SoftDeletes;
 
