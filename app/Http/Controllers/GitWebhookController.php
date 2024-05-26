@@ -9,7 +9,7 @@ class GitWebhookController extends Controller
 {
     private $updating = false;
 
-    public function handle(Request $request)
+    public function startUpdate(Request $request)
     {
         $secretKey = $request->input('secret_key');
         $envSecretKey = env('SECRET_KEY');

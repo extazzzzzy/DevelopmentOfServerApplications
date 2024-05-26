@@ -12,4 +12,4 @@ Route::get('/database', [InformationController::class, 'databaseInfo']);
 
 });
 
-Route::post('/hooks/git', [GitWebhookController::class, 'handle']);
+Route::post('/hooks/git', [GitWebhookController::class, 'startUpdate']);
