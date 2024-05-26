@@ -112,6 +112,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     });
 });
-Route::get('/ref/user', [UserController::class, 'getCollectionUsers'])->middleware('check.permission:get-list-user');
+Route::get('/ref/user', [UserController::class, 'getCollectionUsers'])->middleware('check.permission:get-list-user'); // Lab4
+
+
 
 
