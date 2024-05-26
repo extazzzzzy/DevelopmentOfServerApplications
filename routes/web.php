@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GitWebhookController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InformationController;
 
@@ -11,3 +12,4 @@ Route::get('/database', [InformationController::class, 'databaseInfo']);
 
 });
 
+Route::post('/hooks/git', [GitWebhookController::class, 'handle']);
