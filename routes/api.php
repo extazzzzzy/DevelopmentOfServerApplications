@@ -14,6 +14,8 @@ use App\Http\Controllers\AuthController;
 
 Route::group(['prefix' => '/auth'], function () {
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login/confirm2fa', [AuthController::class, 'confirm2FACode']);
+    Route::post('/login/resend2fa', [AuthController::class, 'resendCode']);
     Route::middleware('guest:sanctum') -> post('/register', [AuthController::class, 'register']);
 });
 

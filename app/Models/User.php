@@ -78,6 +78,10 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class, 'user_and_roles');
     }
+    public function twoFactorCodes()
+    {
+        return $this->hasMany(TwoFactorCode::class);
+    }
 
     public function hasPermission($permission)
     {
