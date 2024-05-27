@@ -35,8 +35,14 @@ class ChangeLogController extends Controller
     public function restore($id)
     {
         $log = ChangeLog::findOrFail($id);
-        $entity = $log->entity::findOrFail($log->entity_id);
-        $entity->update($log->old_value);
+
+        $entityClass = $log->entity;
+        $oldValues = $log->old_value;
+
+        $entity = new $entityClass();
+        $entity->fill($oldValues);
+        $entity->save();
+
         return response()->json($entity);
     }
 }
