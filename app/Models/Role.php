@@ -18,8 +18,6 @@ class Role extends Model
         'name',
         'description',
         'cipher',
-        'created_by',
-        'deleted_by'
     ];
 
     protected static function boot()
