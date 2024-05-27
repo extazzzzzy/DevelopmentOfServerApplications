@@ -37,12 +37,27 @@ class ChangeLogController extends Controller
         $log = ChangeLog::findOrFail($id);
 
         $entityClass = $log->entity;
+        $entityId = $log->entity_id;
         $oldValues = $log->old_value;
 
-        $entity = new $entityClass();
-        $entity->fill($oldValues);
-        $entity->save();
+        $entity = $entityClass::withTrashed()->find($entityId);
+
+        if ($entity)
+        {
+            if ($entity->trashed())
+            {
+                $entity->restore();
+            }
+            $entity->update($oldValues);
+        }
+        else
+        {
+            $entity = new $entityClass();
+            $entity->fill($oldValues);
+            $entity->save();
+        }
 
         return response()->json($entity);
     }
+
 }
