@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class GitWebhookController extends Controller
@@ -16,7 +17,7 @@ class GitWebhookController extends Controller
         {
             return response()->json(['error' => 'Неверный ключ!'], 403);
         }
-        
+
         $lock = Cache::lock('update-codebase', 600);
 
         if (!$lock->get())
