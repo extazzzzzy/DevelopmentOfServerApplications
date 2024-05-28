@@ -8,8 +8,14 @@ class LogRequestCollectionDTO
 
     public function __construct($logs)
     {
-        $this->logs = array_map(function($log) {
-            return new LogRequestDTO($log);
-        }, $logs->toArray());
+        $this->logs = $logs->map(function ($log) {
+            return [
+                'url' => $log['url'],
+                'controller' => $log['controller'],
+                'controller_method' => $log['controller_method'],
+                'response_status' => $log['response_status'],
+                'called_at' => $log['called_at'],
+            ];
+        });
     }
 }

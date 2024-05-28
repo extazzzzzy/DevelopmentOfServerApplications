@@ -43,6 +43,8 @@ class Kernel extends HttpKernel
             'throttle:api',
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+
+            'log.requests',
         ],
     ];
 
@@ -69,5 +71,6 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'check.permission' => \App\Http\Middleware\CheckPermission::class,
+        'log.requests' => \App\Http\Middleware\LogRequests::class,
     ];
 }

@@ -38,6 +38,10 @@ class PermissionsTableSeeder extends Seeder
             ['name' => 'get-story-user', 'cipher' => Str::uuid(), 'created_at' => now(), 'updated_at' => now(), 'created_by' => 0],
             ['name' => 'get-story-collection', 'cipher' => Str::uuid(), 'created_at' => now(), 'updated_at' => now(), 'created_by' => 0],
             ['name' => 'update-story', 'cipher' => Str::uuid(), 'created_at' => now(), 'updated_at' => now(), 'created_by' => 0],
+
+            ['name' => 'get-list-logs-requests', 'cipher' => Str::uuid(), 'created_at' => now(), 'updated_at' => now(), 'created_by' => 0],
+            ['name' => 'get-log-request', 'cipher' => Str::uuid(), 'created_at' => now(), 'updated_at' => now(), 'created_by' => 0],
+            ['name' => 'delete-log-request', 'cipher' => Str::uuid(), 'created_at' => now(), 'updated_at' => now(), 'created_by' => 0],
         ]);
 
         DB::table('permissions')->insert($permissions);

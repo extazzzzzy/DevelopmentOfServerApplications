@@ -9,6 +9,8 @@ class LogRequest extends Model
 {
     use HasFactory;
 
+    protected $table = 'logs_requests';
+
     protected $fillable = [
         'url',
         'method',
