@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class GitWebhookController extends Controller
 {
-    private $updating = false;
-
     public function startUpdate(Request $request)
     {
         $secretKey = $request->input('secret_key');
@@ -19,25 +18,23 @@ class GitWebhookController extends Controller
             return response()->json(['error' => 'Неверный ключ!'], 403);
         }
 
-        if ($this->updating)
+        $lock = Cache::lock('update-codebase', 600);
+
+        if (!$lock->get())
         {
-            return response()->json(['message' => 'Повторите попытку позже.'], 429);
+            return response()->json(['message' => 'Повторите попытку позже. Обновление уже выполняется.'], 429);
         }
-
-        $this->updating = true;
-
-        $this->logRequest($request);
 
         try
         {
+            $this->logRequest($request);
             $this->updateCodebase();
-            $this->updating = false;
+            $lock->release();
             return response()->json(['message' => 'Код успешно обновлён.']);
         }
-
         catch (\Exception $e)
         {
-            $this->updating = false;
+            $lock->release();
             return response()->json(['error' => 'Ошибка при обновлении кода.'], 500);
         }
     }
