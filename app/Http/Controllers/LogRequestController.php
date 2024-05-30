@@ -17,13 +17,17 @@ class LogRequestController extends Controller
         $logs = LogRequest::query();
 
         if ($request->has('filter')) {
-            $filter = $request->filter;
-            $logs->where($filter['key'], $filter['value']);
+            $filters = $request->filter;
+            foreach ($filters as $filter) {
+                $logs->where($filter['key'], $filter['value']);
+            }
         }
 
         if ($request->has('sortBy')) {
-            $sort = $request->sortBy;
-            $logs->orderBy($sort['key'], $sort['order']);
+            $sorts = $request->sortBy;
+            foreach ($sorts as $sort) {
+                $logs->orderBy($sort['key'], $sort['order']);
+            }
         }
 
         $count = $request->input('count', 10);
