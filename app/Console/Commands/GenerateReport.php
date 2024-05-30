@@ -40,43 +40,43 @@ class GenerateReport extends Command
     {
         $startTime = Carbon::now();
         $maxExecutionTime = env('REPORT_MAX_EXECUTION_TIME_MINUTES', 30);
-        $hoursInterval = env('REPORT_INTERVAL_HOURS', 1);
+        $hoursInterval = env('REPORT_INTERVAL_HOURS', 24);
         $reportStartTime = Carbon::now()->subHours($hoursInterval);
 
         Log::info('Начало генерации отчёта...');
 
-        $methodCalls = LogRequest::select('controller_method', DB::raw('count(*) as total'))
+        $methodCalls = LogRequest::select('controller_method', DB::raw('count(*) as total'), DB::raw('max(created_at) as last_interaction'))
             ->where('created_at', '>=', $reportStartTime)
             ->groupBy('controller_method')
             ->orderByDesc('total')
             ->get();
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
-        $entityChanges = ChangeLog::select('entity', DB::raw('count(*) as total'))
+        $entityChanges = ChangeLog::select('entity', DB::raw('count(*) as total'), DB::raw('max(created_at) as last_interaction'))
             ->where('created_at', '>=', $reportStartTime)
             ->groupBy('entity')
             ->orderByDesc('total')
             ->get();
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
-        $userRequests = LogRequest::select('user_id', DB::raw('count(*) as total'))
+        $userRequests = LogRequest::select('user_id', DB::raw('count(*) as total'), DB::raw('max(created_at) as last_interaction'))
             ->where('created_at', '>=', $reportStartTime)
             ->groupBy('user_id')
             ->orderByDesc('total')
             ->get();
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
-        $userAuthentications = LogRequest::select('user_id', DB::raw('count(*) as total'))
+        $userAuthentications = LogRequest::select('user_id', DB::raw('count(*) as total'), DB::raw('max(created_at) as last_interaction'))
             ->where('created_at', '>=', $reportStartTime)
             ->where('controller_method', 'login')
             ->groupBy('user_id')
             ->orderByDesc('total')
             ->get();
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
         $userPermissions = User::select('users.id', 'users.username', DB::raw('count(*) as total_permissions'))
             ->join('user_and_roles', 'users.id', '=', 'user_and_roles.user_id')
@@ -86,15 +86,15 @@ class GenerateReport extends Command
             ->orderByDesc('total_permissions')
             ->get();
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
-        $userChanges = ChangeLog::select('user_id', DB::raw('count(*) as total'))
+        $userChanges = ChangeLog::select('user_id', DB::raw('count(*) as total'), DB::raw('max(created_at) as last_interaction'))
             ->where('created_at', '>=', $reportStartTime)
             ->groupBy('user_id')
             ->orderByDesc('total')
             ->get();
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
         $reportData = [
             'method_calls' => $methodCalls,
@@ -113,7 +113,7 @@ class GenerateReport extends Command
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Полный отчёт');
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
         $sheet->setCellValue('A1', 'Тип отчёта');
         $sheet->setCellValue('B1', $reportData['report_type']);
@@ -122,78 +122,88 @@ class GenerateReport extends Command
 
         $sheet->setCellValue('A4', 'Метод');
         $sheet->setCellValue('B4', 'Количество вызовов');
+        $sheet->setCellValue('C4', 'Последний вызов');
 
         $row = 5;
         foreach ($reportData['method_calls'] as $methodCall) {
             $sheet->setCellValue('A' . $row, $methodCall->controller_method);
             $sheet->setCellValue('B' . $row, $methodCall->total);
+            $sheet->setCellValue('C' . $row, $methodCall->last_interaction);
             $row++;
         }
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
-        $sheet->setCellValue('D4', 'Сущность');
-        $sheet->setCellValue('E4', 'Количество изменений');
+        $sheet->setCellValue('E4', 'Сущность');
+        $sheet->setCellValue('F4', 'Количество изменений');
+        $sheet->setCellValue('G4','Последнее изменение');
 
         $row = 5;
         foreach ($reportData['entity_changes'] as $entityChange) {
-            $sheet->setCellValue('D' . $row, $entityChange->entity);
-            $sheet->setCellValue('E' . $row, $entityChange->total);
+            $sheet->setCellValue('E' . $row, $entityChange->entity);
+            $sheet->setCellValue('F' . $row, $entityChange->total);
+            $sheet->setCellValue('G' . $row, $entityChange->last_interaction);
             $row++;
         }
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
-        $sheet->setCellValue('G4', 'Пользователь');
-        $sheet->setCellValue('H4', 'Количество запросов');
+        $sheet->setCellValue('I4', 'Пользователь');
+        $sheet->setCellValue('J4', 'Количество запросов');
+        $sheet->setCellValue('K4', 'Последний запрос');
 
         $row = 5;
         foreach ($reportData['user_requests'] as $userRequest) {
             $user = User::find($userRequest->user_id);
-            $sheet->setCellValue('G' . $row, $user ? $user->username : '-');
-            $sheet->setCellValue('H' . $row, $userRequest->total);
+            $sheet->setCellValue('I' . $row, $user ? $user->username : '-');
+            $sheet->setCellValue('J' . $row, $userRequest->total);
+            $sheet->setCellValue('K' . $row, $userRequest->last_interaction);
             $row++;
         }
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
-        $sheet->setCellValue('J4', 'Пользователь');
-        $sheet->setCellValue('K4', 'Количество авторизаций');
+        $sheet->setCellValue('M4', 'Пользователь');
+        $sheet->setCellValue('N4', 'Количество авторизаций');
+        $sheet->setCellValue('O4', 'Последняя авторизация');
 
         $row = 5;
         foreach ($reportData['user_authentications'] as $userAuthentication) {
             $user = User::find($userAuthentication->user_id);
-            $sheet->setCellValue('J' . $row, $user ? $user->username : '-');
-            $sheet->setCellValue('K' . $row, $userAuthentication->total);
+            $sheet->setCellValue('M' . $row, $user ? $user->username : '-');
+            $sheet->setCellValue('N' . $row, $userAuthentication->total);
+            $sheet->setCellValue('O' . $row, $userAuthentication->last_interaction);
             $row++;
         }
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
-        $sheet->setCellValue('M4', 'Пользователь');
-        $sheet->setCellValue('N4', 'Количество разрешений');
+        $sheet->setCellValue('Q4', 'Пользователь');
+        $sheet->setCellValue('R4', 'Количество разрешений');
 
         $row = 5;
         foreach ($reportData['user_permissions'] as $userPermission) {
-            $sheet->setCellValue('M' . $row, $userPermission->username);
-            $sheet->setCellValue('N' . $row, $userPermission->total_permissions);
+            $sheet->setCellValue('Q' . $row, $userPermission->username);
+            $sheet->setCellValue('R' . $row, $userPermission->total_permissions);
             $row++;
         }
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
-        $sheet->setCellValue('P4', 'Пользователь');
-        $sheet->setCellValue('Q4', 'Количество изменений');
+        $sheet->setCellValue('T4', 'Пользователь');
+        $sheet->setCellValue('U4', 'Количество изменений');
+        $sheet->setCellValue('V4', 'Последнее изменение пользователем');
 
         $row = 5;
         foreach ($reportData['user_changes'] as $userChange) {
             $user = User::find($userChange->user_id);
-            $sheet->setCellValue('P' . $row, $user ? $user->username : '-');
-            $sheet->setCellValue('Q' . $row, $userChange->total);
+            $sheet->setCellValue('T' . $row, $user ? $user->username : '-');
+            $sheet->setCellValue('U' . $row, $userChange->total);
+            $sheet->setCellValue('V' . $row, $userChange->last_interaction);
             $row++;
         }
 
-        $this->checkExecutionTime($startTime, $maxExecutionTime);
+        if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
         $writer = new Xlsx($spreadsheet);
         $filePath = storage_path('app/public/' . $fileName);
@@ -206,7 +216,7 @@ class GenerateReport extends Command
         })->get();
 
         foreach ($admins as $admin) {
-            $this->checkExecutionTime($startTime, $maxExecutionTime);
+            if ($this->isExecutionTime($startTime, $maxExecutionTime)) return;
 
             $this->sendReport($admin, $filePath);
         }
@@ -244,11 +254,11 @@ class GenerateReport extends Command
         }
     }
 
-    private function checkExecutionTime($startTime, $maxExecutionTime)
+    private function isExecutionTime($startTime, $maxExecutionTime)
     {
         if ((Carbon::now()->diffInSeconds($startTime)) > $maxExecutionTime) {
             Log::warning('Время для выполнения задачи истекло!');
-            return;
+            return True;
         }
     }
 }

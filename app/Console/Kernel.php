@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $interval = env('REPORT_TASK_TIMEOUT_MINUTES', 60);
+        $schedule->command('app:generate-report')->everyMinute($interval);
     }
 
     /**
@@ -24,4 +25,8 @@ class Kernel extends ConsoleKernel
 
         require base_path('routes/console.php');
     }
+
+    protected $commands = [
+        \App\Console\Commands\GenerateReport::class,
+    ];
 }
