@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\ChangeLog;
 use App\Models\LogRequest;
-use App\Models\TwoFactorCode;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -260,5 +259,6 @@ class GenerateReport extends Command
             Log::warning('Время для выполнения задачи истекло!');
             return True;
         }
+        else return False;
     }
 }
